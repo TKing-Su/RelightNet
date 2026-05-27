@@ -1,0 +1,1 @@
+xvfb-run -s "-screen 0 1024x768x24" python relight.py

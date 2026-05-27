@@ -1,0 +1,146 @@
+{
+    "frame_count": 1,
+    "frame_rate": -1.0,
+    "supports_lidar": false,
+    "orientation": 1,
+    "sensor_height": 36.0,
+    "scale": 1.0,
+    "resolution": [
+        512,
+        512
+    ],
+    "studio": {
+        "transform": [
+            [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            [
+                0.0,
+                -1.0,
+                0.0,
+                0.0
+            ],
+            [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ]
+        ]
+    },
+    "frames": [
+        {
+            "camera_given": false,
+            "supports_lidar": false,
+            "timestamp": -1,
+            "eye": [
+                0,
+                1.7,
+                1
+            ],
+            "center": [
+                0,
+                1.7,
+                0
+            ],
+            "up": [
+                0,
+                1,
+                0
+            ],
+            "focal_length": 50,
+            "studio": {
+                "transform": [
+                    [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        -1.0,
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                ]
+            },
+            "transform": [
+                [
+                    -1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.7
+                ],
+                [
+                    0.0,
+                    0.0,
+                    -1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            ],
+            "principal_point": [
+                256.0,
+                256.0
+            ],
+            "lens_shift_x": 0.0,
+            "lens_shift_y": 0.0,
+            "scale": 1.0,
+            "resolution": [
+                512,
+                512
+            ],
+            "orientation": 1,
+            "sensor_height": 36.0,
+            "frame_idx": 0,
+            "depth_min": 0.9441342949867249,
+            "depth_max": 1.6296056509017944,
+            "position_median": [
+                0.0,
+                0.0,
+                -1.240378499031067
+            ],
+            "position_foot": [
+                0.0,
+                0.0,
+                -1.240378499031067
+            ]
+        }
+    ],
+    "model_version": "3.0.2",
+    "pbr_4kmax": false,
+    "deflicker": true
+}
