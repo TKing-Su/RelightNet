@@ -1,0 +1,26 @@
+{
+  "mode": "robust_quantile",
+  "source_range_used": [
+    0.008022857829928398,
+    0.998046875
+  ],
+  "quantiles": [
+    0.002,
+    0.998
+  ],
+  "png_range": [
+    0,
+    65535
+  ],
+  "raw_min": 0.0,
+  "raw_max": 1.0,
+  "raw_mean": 0.3208565413951874,
+  "output_near_bright": true,
+  "note": "16-bit PNG. 当前脚本默认输出近处亮、远处暗，适配 relight1 中 depth_invert=True 的用法。",
+  "selected_channel": "R",
+  "available_channels": [
+    "B",
+    "G",
+    "R"
+  ]
+}

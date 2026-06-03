@@ -1,4 +1,13 @@
-export LIBGL_DRIVERS_PATH=/usr/lib/x86_64-linux-gnu/dri
-export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
-export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
-xvfb-run -s "-screen 0 1024x768x24" python /autodl-fs/data/relight.py "$@"
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -n "${PYTHON:-}" ]]; then
+  PYTHON_BIN="$PYTHON"
+elif [[ -x "/d/Anaconda/python.exe" ]]; then
+  PYTHON_BIN="/d/Anaconda/python.exe"
+else
+  PYTHON_BIN="python"
+fi
+
+"$PYTHON_BIN" "$ROOT_DIR/main.py" "$@"

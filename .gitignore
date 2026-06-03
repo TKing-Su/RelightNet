@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+
+.DS_Store
+
+# Generated render/debug/eval outputs.
+metrics_*.csv
+*_smoke*/
+*_looksafe/
+/output*/
+/Debug/
+/DebugShadow/
+/QualityReport/
+test/_reports/
+batch_test/**/_reports/
+
+# Non-core scratch/test folders kept only if a local user needs them.
+test/
+singel_test/

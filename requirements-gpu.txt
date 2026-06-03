@@ -1,0 +1,6 @@
+# Optional CUDA acceleration for selected large array filters.
+# Install this in addition to requirements.txt when using --device cuda.
+#
+# Use cupy-cuda12x for CUDA 12.x. If your system uses CUDA 11.x, install the
+# matching CuPy package instead, for example cupy-cuda11x.
+cupy-cuda12x>=13.0
