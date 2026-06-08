@@ -31,7 +31,7 @@ Input pass examples from `singel_test/`:
 
 Background lighting looks:
 
-<img src="docs/showcase/comparisons/lighting_styles_compact.png" width="536">
+<img src="docs/showcase/comparisons/lighting_styles_compact.png" alt="Background lighting looks" width="812">
 
 ## Project Structure
 
