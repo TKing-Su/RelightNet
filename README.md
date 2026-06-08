@@ -1,166 +1,204 @@
 # Background Driven Portrait Relight
 
-A Python portrait relighting pipeline that transfers the lighting impression of a
-background image onto a rendered portrait pass set.
+A Python portrait relighting pipeline for rendered portrait pass sets. It reads a
+portrait source image plus render passes, analyzes a background image, and
+transfers the background's lighting impression onto the subject.
 
-The current route is a single `look-safe` pipeline. It keeps face/body exposure
-stable while using the background to drive light direction, ambient color, rim
-light, contrast and final display finish.
+The supported route is the `look-safe` pipeline. It keeps face and body exposure
+stable while letting the background drive light direction, ambient color, rim
+light, contrast and display finish.
 
-## Structure
+## Key Features
+
+- Background-driven portrait relighting from image analysis, not filename style rules.
+- Single maintained `look-safe` route for stable face/body exposure.
+- Subject-aware lighting across face, body, hair, clothes, rim and shadow regions.
+- Built-in background presets: `cyber`, `misty`, `sunset`, `red`, `ice`, `exam`.
+- Optional CUDA acceleration for selected large blur operations.
+- Debug images and quality reports available from the CLI.
+
+## Preview
+
+Input pass examples from `singel_test/`:
+
+| Source | Alpha | BaseColor |
+| --- | --- | --- |
+| <img src="docs/showcase/source.png" width="180"> | <img src="docs/showcase/alpha.png" width="180"> | <img src="docs/showcase/basecolor.png" width="180"> |
+
+| Normal | Specular | Roughness |
+| --- | --- | --- |
+| <img src="docs/showcase/normal.png" width="180"> | <img src="docs/showcase/specular.png" width="180"> | <img src="docs/showcase/roughness.png" width="180"> |
+
+Background lighting looks:
+
+<img src="docs/showcase/comparisons/lighting_styles_compact.png" width="536">
+
+## Project Structure
 
 ```text
-main.py                 # CLI entry
-interface/cli.py        # argument parsing and path setup
-config/                 # constants, paths, background assets
-lighting/               # background analysis, light scene, presets
-rendering/              # relight pipeline and rendering stages
-tools/                  # image, color, filter and geometry helpers
+render/
+|-- main.py                 # Python entry
+|-- run_test.sh             # CLI wrapper
+|-- vfx_filter.py           # optional pass organizer before relighting
+|-- vfx_filter.sh
+|-- requirements*.txt
+|-- config/
+|   |-- constants.py
+|   |-- paths.py
+|   `-- background/         # bundled/selectable backgrounds
+|-- interface/
+|   `-- cli.py              # argument parsing and route setup
+|-- lighting/
+|   |-- background_analyzer.py
+|   |-- light_scene.py
+|   `-- models.py           # descriptors and policy data
+|-- rendering/
+|   |-- pipeline.py
+|   |-- setup/              # input passes, masks, gradients
+|   |-- look/               # look-safe allocation and atmosphere
+|   |-- face/               # face/body region balancing
+|   |-- light/              # key/fill/rim light behavior
+|   |-- environment/        # background gradient, HDRI, PBR-like terms
+|   |-- display/            # shadows and final display finish
+|   |-- passes/             # main render pass
+|   `-- finalize/           # composite, debug, quality, batch
+|-- tools/
+|   |-- color.py
+|   |-- filters.py
+|   `-- image_io.py
+|-- docs/showcase/          # README preview images
+`-- singel_test/            # sample input pass folder
+```
+
+Main route:
+
+```text
+main.py
+-> interface/cli.py
+-> lighting/background_analyzer.py
+-> lighting/light_scene.py
+-> rendering/pipeline.py
+-> rendering/passes/render_pass.py
+-> rendering/finalize/batch.py
 ```
 
 ## Installation
 
-Python 3.10+ is recommended.
-
-Create and activate a virtual environment:
-
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-```
-
-On Windows PowerShell:
-
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-Install dependencies:
-
-```bash
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Minimal runtime dependencies:
-
-```text
-numpy
-Pillow
-tqdm
-```
-
-No PyTorch, OpenCV or GPU runtime is required for the current core route.
-
-Optional CUDA acceleration uses CuPy for selected large blur operations:
+Optional CUDA dependency:
 
 ```bash
 pip install -r requirements-gpu.txt
-python main.py --device cuda --input-dir E:/your/input_passes --back cyber
 ```
 
-Use auto mode to fall back to CPU when CuPy/CUDA is unavailable:
+## Input Folder
 
-```bash
-python main.py --device auto --input-dir E:/your/input_passes --back cyber
-```
-
-The GPU route is optional and conservative. Image loading/saving still uses
-Pillow on CPU, and only selected large array filters are sent to CUDA.
-
-If you use Conda:
-
-```bash
-conda create -n render python=3.10 -y
-conda activate render
-pip install -r requirements.txt
-```
-
-## Input Layout
-
-The input directory must contain these pass folders:
+The input folder is a render-pass directory:
 
 ```text
 Source/
 Alpha/
 Normal/
 Depth/
-BaseColor/ or EightColor/ or Color/
+BaseColor/    # or EightColor/ or Color/
+Specular/     # optional
+Roughness/    # optional
+Camera.json   # optional
 ```
 
-Optional folders:
+The included sample input is:
 
 ```text
-Specular/
-Roughness/
-Camera.json
+E:/render/singel_test
 ```
 
-Supported image formats are PNG, JPG, JPEG and WEBP. EXR inputs should be
-converted before running the current core route.
+## Before Relighting: vfx_filter
 
-## Run
+`vfx_filter` is the optional pre-lighting preparation step. Use it before the
+relighting command when your exported VFX/render passes are still raw, mixed, or
+not arranged in the folder layout required by this project.
 
-Use the bundled sample input:
+Its purpose is to prepare a clean relight input folder:
+
+```text
+raw exported passes
+-> vfx_filter
+-> Source / Alpha / Normal / Depth / BaseColor / Specular / Roughness
+-> background-driven relighting
+```
+
+Typical use:
 
 ```bash
-sh run_test.sh --back cyber
+sh E:/render/vfx_filter.sh
 ```
 
-Use your own input directory:
+After it finishes, point `--input-dir` at the generated pass folder and run the
+relight command. If your input is already organized like `singel_test`, skip this
+step and run relighting directly.
+
+## Quick Start
 
 ```bash
-sh run_test.sh --input-dir E:/your/input_passes --back cyber
-sh run_test.sh --device auto --input-dir E:/your/input_passes --back cyber
+sh run_test.sh --input-dir E:/render/singel_test --back cyber
 ```
 
-Choose an exact output directory:
+## Background Images
 
-```bash
-sh run_test.sh --input-dir E:/your/input_passes --back cyber --output-dir E:/your/results/cyber
-```
-
-Direct Python entry:
-
-```bash
-python main.py --input-dir E:/your/input_passes --back cyber
-```
-
-## Backgrounds
-
-Built-in backgrounds live in:
+Put background images here:
 
 ```text
 config/background/
 ```
 
-Select a background by name or file path:
+Select a background by filename stem:
 
-```bash
-python main.py --back cyber
-python main.py --back E:/backgrounds/my_bg.png
+```text
+config/background/cyber.png  ->  --back cyber
+config/background/red.png    ->  --back red
 ```
 
 ## Outputs
 
-Each run creates:
+Without `--output-dir`, outputs are created under the input folder:
 
 ```text
-Render/          # final composite
-Relit/           # relit foreground
-Cutout/          # transparent foreground cutout
-HDRI/            # lighting preview
-LightingInfo/    # extracted light data
-QualityReport/   # optional quality report
+singel_test/output_cyber_looksafe/
 ```
 
-The CLI prints the final render folder and the first generated image path after
-processing finishes.
+Common output folders:
 
-## Notes
+```text
+Render/          final composited images
+Relit/           relit foreground
+Cutout/          transparent foreground cutout
+HDRI/            lighting preview
+LightingInfo/    extracted background lighting data
+QualityReport/   per-image quality report
+Debug/           intermediate images when --debug is used
+```
 
-- `main.py` is the only user-facing entry.
-- The default route is `look-safe`; there is no legacy route switch.
-- Style expression comes from background analysis, not filename-specific rules.
-- Rendering logic is separated into `lighting/`, `rendering/` and `tools/`.
+## Configuration
+
+| Flag | Description |
+| --- | --- |
+| `--input-dir` / `--base-path` | Input pass root |
+| `--back` | Background name or direct image path |
+| `--background-dir` | Folder used to resolve background names |
+| `--output-dir` | Exact output root |
+| `--device cpu|cuda|auto` | Execution backend |
+| `--gpu` | Shortcut for `--device cuda` |
+| `--debug` | Save intermediate debug images |
+| `--no-quality-report` | Disable quality report JSON output |
+
+## Development Rules
+
+- Keep one user-facing route: `main.py` -> `interface/cli.py`.
+- Keep style expression driven by background analysis, not filename-specific branches.
+- Put background analysis changes in `lighting/`.
+- Put subject relighting changes in the matching `rendering/` subsystem.
+- Put low-level reusable helpers in `tools/`.
+- Avoid reintroducing legacy route switches or broad compatibility wrappers.

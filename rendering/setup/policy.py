@@ -76,26 +76,9 @@ class RendererPolicyMixin:
         region = budget.get('region', {})
         render_weight = budget.get('render_weight', {})
         display = budget.get('display', {})
-        if not self.look_safe:
-            return LookPolicy(
-                route='legacy',
-                creative_profile=str(getattr(self, 'style_mode', 'quality')),
-                v32_style=self._v32_style_key(None),
-                filename_style_hints_enabled=True,
-                extractor_style='neon' if getattr(self, 'style_mode', 'quality') == 'neon' else 'default',
-                descriptor=descriptor,
-                style_expression=style_expression,
-                exposure=exposure,
-                chroma=chroma,
-                direction=direction,
-                region=region,
-                render_weight=render_weight,
-                display=display,
-                budget=budget,
-            )
         return LookPolicy(
             route='continuous_budget',
-            creative_profile=str(getattr(self, 'style_mode', 'quality')),
+            creative_profile='quality',
             v32_style='continuous',
             filename_style_hints_enabled=False,
             extractor_style='default',
@@ -120,12 +103,6 @@ class RendererPolicyMixin:
     
         Must be called after background analysis is complete and descriptor is computed.
         """
-        if not self.look_safe:
-            # Non-look-safe mode: preserve legacy behavior with all style branches
-            self._clear_look_policy()
-            return
-    
-        # Look-safe mode: enforce continuous budget
         budget = compute_atmosphere_budget(descriptor) if descriptor else {}
         self._set_look_policy(descriptor, budget)
     

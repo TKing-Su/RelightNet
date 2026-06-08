@@ -734,19 +734,6 @@ class RendererRenderMixin:
             relit += ambient_color * (0.16 * shadow_mask[..., None])
             relit += base_subject * (0.08 * shadow_mask[..., None])
 
-        # The core route reserves final style expression for the compact layer
-        # after auto-gain.
-        if not self._using_continuous_policy():
-            relit = self._v32_style_block_router(
-                relit,
-                source_linear,
-                subject_mask,
-                face_core,
-                hair_region,
-                edge_band,
-                lighting_info,
-            )
-
         if np.any(subject_mask > 0.20):
             relit_luma = rgb_luminance(relit)
             gf_for_target = getattr(lighting_info, 'gradient_field', {}) if hasattr(lighting_info, 'gradient_field') else {}
